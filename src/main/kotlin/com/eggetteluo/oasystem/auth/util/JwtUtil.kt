@@ -1,9 +1,12 @@
 package com.eggetteluo.oasystem.auth.util
 
+import com.eggetteluo.oasystem.auth.dto.JwtPayload
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Component
+import java.time.Duration
 import java.util.Date
+import java.util.UUID
 import javax.crypto.SecretKey
 
 @Component
@@ -11,26 +14,43 @@ class JwtUtil {
 
     private val secretString = "mySuperSecretKeyForOaSystemJwtToken2026!"
     private val secretKey: SecretKey = Keys.hmacShaKeyFor(secretString.toByteArray())
-    private val expirationTime = 86400000 // 24小时 (毫秒)
+    private val expirationTime = Duration.ofHours(24)
 
-    // 生成 Token
-    fun generateToken(username: String): String {
+    /**
+     * 生成 JWT
+     */
+    fun generateToken(userId: UUID, jti: String): String {
+        val now = System.currentTimeMillis()
+
         return Jwts.builder()
-            .subject(username)
-            .issuedAt(Date())
-            .expiration(Date(System.currentTimeMillis() + expirationTime))
+            .subject(userId.toString())
+            .id(jti)
+            .issuedAt(Date(now))
+            .expiration(Date(now + expirationTime.toMillis()))
             .signWith(secretKey)
             .compact()
     }
 
-    // 从 Token 中解析出用户名
-    fun extractUsername(token: String): String? {
-        return try {
-            Jwts.parser().verifyWith(secretKey).build()
-                .parseSignedClaims(token).payload.subject
-        } catch (e: Exception) {
-            null // 解析失败（过期或被篡改）返回 null
-        }
+    /**
+     * 解析 JWT
+     */
+    fun parseToken(token: String): JwtPayload? {
+        val claims = Jwts.parser()
+            .verifyWith(secretKey)
+            .build()
+            .parseSignedClaims(token)
+            .payload
+
+        val userIdText = claims.subject ?: return null
+        val userId = UUID.fromString(userIdText)
+        val jti = claims.id ?: return null
+        val expiration = claims.expiration ?: return null
+
+        return JwtPayload(
+            userId = userId,
+            jti = jti,
+            expiresAt = expiration.toInstant()
+        )
     }
 
 }

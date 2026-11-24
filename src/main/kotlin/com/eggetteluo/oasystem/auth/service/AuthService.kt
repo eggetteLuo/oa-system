@@ -2,7 +2,7 @@ package com.eggetteluo.oasystem.auth.service
 
 import com.eggetteluo.oasystem.auth.dto.LoginRequest
 import com.eggetteluo.oasystem.auth.dto.LoginResponse
-import com.eggetteluo.oasystem.auth.util.JwtUtil
+import com.eggetteluo.oasystem.auth.dto.TokenResponse
 import com.eggetteluo.oasystem.common.exception.BusinessException
 import com.eggetteluo.oasystem.user.enums.UserStatus
 import com.eggetteluo.oasystem.user.repository.UserRepository
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service
 class AuthService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtUtil: JwtUtil,
     private val tokenService: TokenService
 ) {
 
@@ -32,24 +31,24 @@ class AuthService(
         }
 
         // 生成 Token
-        val token = jwtUtil.generateToken(user.username)
-
-        // 存入 Redis 实现单点登录
-        tokenService.saveToken(user.id.toString(), token)
+        val token = tokenService.createToken(user.id!!)
 
         return LoginResponse(token, user.username, user.realName)
     }
 
+    fun refreshToken(authHeader: String): TokenResponse {
+        val oldToken = authHeader.removePrefix("Bearer ").trim()
+        // 刷新 Token
+        val newToken = tokenService.refreshToken(oldToken) ?: throw BusinessException(401, "登录已失效，请重新登录")
+        return TokenResponse(newToken)
+    }
+
     fun logout(authHeader: String) {
         val token = authHeader.removePrefix("Bearer ").trim()
-        val username = jwtUtil.extractUsername(token)
-
-        if (username != null) {
-            val user = userRepository.findByUsername(username)
-            if (user != null) {
-                // 从 Redis 中删除 Token
-                tokenService.deleteToken(user.id.toString(), token)
-            }
+        // 删除 Token
+        val result = tokenService.deleteToken(token)
+        if (!result) {
+            throw BusinessException(401, "登录已失效，请重新登录")
         }
     }
 
