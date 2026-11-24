@@ -1,5 +1,6 @@
 package com.eggetteluo.oasystem.user.controller
 
+import com.eggetteluo.oasystem.common.response.ApiResponse
 import com.eggetteluo.oasystem.user.dto.CreateUserRequest
 import com.eggetteluo.oasystem.user.dto.UserResponse
 import com.eggetteluo.oasystem.user.service.UserService
@@ -12,12 +13,12 @@ class UserController(
     private val userService: UserService
 ) {
     @PostMapping
-    fun createUser(@Valid @RequestBody request: CreateUserRequest): Result<UserResponse> {
-        return Result.success(userService.createUser(request))
+    fun createUser(@Valid @RequestBody request: CreateUserRequest): ApiResponse<UserResponse> {
+        return ApiResponse.success(userService.createUser(request))
     }
 
     @GetMapping
-    fun getAllUsers(): Result<List<UserResponse>> {
-        return Result.success(userService.getAllUsers())
+    fun getAllUsers(): ApiResponse<List<UserResponse>> {
+        return ApiResponse.success(userService.getAllUsers())
     }
 }

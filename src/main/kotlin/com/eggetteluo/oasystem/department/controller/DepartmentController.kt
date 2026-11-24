@@ -1,5 +1,6 @@
 package com.eggetteluo.oasystem.department.controller
 
+import com.eggetteluo.oasystem.common.response.ApiResponse
 import com.eggetteluo.oasystem.department.dto.CreateDeptRequest
 import com.eggetteluo.oasystem.department.dto.DeptResponse
 import com.eggetteluo.oasystem.department.service.DepartmentService
@@ -19,18 +20,18 @@ class DepartmentController(
 ) {
 
     @PostMapping
-    fun create(@Valid @RequestBody request: CreateDeptRequest): Result<DeptResponse> {
-        return Result.success(departmentService.createDept(request))
+    fun create(@Valid @RequestBody request: CreateDeptRequest): ApiResponse<DeptResponse> {
+        return ApiResponse.success(departmentService.createDept(request))
     }
 
     @GetMapping
-    fun getAll(): Result<List<DeptResponse>> {
-        return Result.success(departmentService.getAllDepts())
+    fun getAll(): ApiResponse<List<DeptResponse>> {
+        return ApiResponse.success(departmentService.getAllDepts())
     }
 
     @GetMapping("/{id}")
-    fun getById(@PathVariable id: UUID): Result<DeptResponse> {
-        return Result.success(departmentService.getDeptById(id))
+    fun getById(@PathVariable id: UUID): ApiResponse<DeptResponse> {
+        return ApiResponse.success(departmentService.getDeptById(id))
     }
 
 }
