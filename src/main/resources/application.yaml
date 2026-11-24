@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: oa-system
+  datasource:
+    url: jdbc:postgresql://localhost:5432/oa_dev
+    username: oa
+    password: oa_pass
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
