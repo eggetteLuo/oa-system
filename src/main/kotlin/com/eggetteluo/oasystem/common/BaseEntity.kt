@@ -10,14 +10,15 @@ import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
+import java.util.UUID
 
 @MappedSuperclass // 不会生成数据表，但是它的字段会被子类继承
 @EntityListeners(AuditingEntityListener::class)
-class BaseEntity {
+abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    var id: Long? = null
+    var id: UUID? = null
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
