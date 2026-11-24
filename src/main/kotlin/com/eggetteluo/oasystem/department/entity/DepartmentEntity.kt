@@ -1,4 +1,4 @@
-package com.eggetteluo.oasystem.user.entity
+package com.eggetteluo.oasystem.department.entity
 
 import com.eggetteluo.oasystem.common.BaseEntity
 import jakarta.persistence.Column

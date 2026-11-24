@@ -1,6 +1,7 @@
 package com.eggetteluo.oasystem.user.entity
 
 import com.eggetteluo.oasystem.common.BaseEntity
+import com.eggetteluo.oasystem.department.entity.DepartmentEntity
 import com.eggetteluo.oasystem.user.enums.UserStatus
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

@@ -9,6 +9,8 @@ data class UserResponse(
     val employeeNo: String,
     val username: String,
     val realName: String,
+    val email: String? = null,
+    val phone: String? = null,
     val status: UserStatus,
     val departmentName: String?,
     val createdAt: LocalDateTime?
