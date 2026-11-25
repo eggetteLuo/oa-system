@@ -11,6 +11,7 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import java.util.UUID
 
 @Entity
 @Table(name = "sys_user")
@@ -38,6 +39,9 @@ class UserEntity(
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     var status: UserStatus = UserStatus.ACTIVE, // 用户状态
+
+    @Column(name = "role_id")
+    var roleId: UUID? = null, // 角色Id
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)

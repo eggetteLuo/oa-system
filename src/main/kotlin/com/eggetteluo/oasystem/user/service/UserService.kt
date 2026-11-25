@@ -4,11 +4,13 @@ import com.eggetteluo.oasystem.common.exception.BusinessException
 import com.eggetteluo.oasystem.common.repository.EmployeeNoSequenceRepository
 import com.eggetteluo.oasystem.common.service.EmployeeNoService
 import com.eggetteluo.oasystem.department.repository.DepartmentRepository
+import com.eggetteluo.oasystem.role.repository.RoleRepository
 import com.eggetteluo.oasystem.user.dto.CreateUserRequest
 import com.eggetteluo.oasystem.user.dto.UserResponse
 import com.eggetteluo.oasystem.user.entity.UserEntity
 import com.eggetteluo.oasystem.user.enums.UserStatus
 import com.eggetteluo.oasystem.user.repository.UserRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,6 +22,7 @@ import java.util.UUID
 class UserService(
     private val userRepository: UserRepository,
     private val departmentRepository: DepartmentRepository,
+    private val roleRepository: RoleRepository,
     private val employeeNoService: EmployeeNoService,
     private val passwordEncoder: PasswordEncoder
 ) {
@@ -71,10 +74,17 @@ class UserService(
     @Transactional
     fun createInitialAdmin(
         password: String,
-        departmentId: UUID
+        departmentId: UUID,
+        roleId: UUID
     ): String? {
         if (userRepository.existsByUsername("admin")) {
             return null
+        }
+
+        // 查询角色
+        val role = roleRepository.findByIdOrNull(roleId) ?: throw BusinessException(400, "角色不存在")
+        if (role.code != "ADMIN" || !role.enabled) {
+            throw BusinessException(400, "超级管理员必须绑定有效的 ADMIN 角色")
         }
 
         // 查询所属部门
@@ -93,7 +103,8 @@ class UserService(
             password = passwordEncoder.encode(password) ?: "",
             realName = "超级管理员",
             status = UserStatus.ACTIVE,
-            department = department
+            department = department,
+            roleId = roleId
         )
 
         userRepository.save(adminUser)

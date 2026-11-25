@@ -18,4 +18,6 @@ interface UserRepository : JpaRepository<UserEntity, UUID> {
 
     fun existsByUsername(username: String): Boolean
 
+    fun countByRoleId(roleId: UUID): Long
+
 }
