@@ -22,7 +22,8 @@ class DepartmentService(
 
         val dept = DepartmentEntity(
             name = request.name,
-            parent = parentDept
+            parent = parentDept,
+            description = request.description
         )
         val saved = departmentRepository.save(dept)
 
@@ -48,6 +49,18 @@ class DepartmentService(
     fun getDeptById(id: UUID): DeptResponse {
         val dept = departmentRepository.findById(id).orElseThrow { BusinessException(404, "部门不存在") }
         return DeptResponse(dept.id!!, dept.name, dept.parent?.id, dept.parent?.name)
+    }
+
+    @Transactional
+    fun getOrCreateSystemDepartment(): UUID {
+        val department = departmentRepository.findByName("系统管理部")
+            ?: departmentRepository.save(
+                DepartmentEntity(
+                    name = "系统管理部",
+                    description = "系统内置的最高权限部门"
+                )
+            )
+        return department.id ?: throw IllegalStateException("系统管理部 ID 不存在")
     }
 
 }

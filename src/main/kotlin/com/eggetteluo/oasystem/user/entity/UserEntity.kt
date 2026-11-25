@@ -16,7 +16,7 @@ import jakarta.persistence.Table
 @Table(name = "sys_user")
 class UserEntity(
 
-    @Column(nullable = false, unique = true, length = 30)
+    @Column(nullable = false, unique = true, length = 20, updatable = false)
     var employeeNo: String = "", // 工号
 
     @Column(nullable = false, unique = true, length = 50)

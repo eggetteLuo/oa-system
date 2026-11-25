@@ -16,4 +16,6 @@ interface UserRepository : JpaRepository<UserEntity, UUID> {
     @EntityGraph(attributePaths = ["department"])
     override fun findAll(): List<UserEntity>
 
+    fun existsByUsername(username: String): Boolean
+
 }
