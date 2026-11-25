@@ -8,4 +8,12 @@ interface DepartmentRepository : JpaRepository<DepartmentEntity, UUID> {
 
     fun findByName(name: String): DepartmentEntity?
 
+    fun findAllByOrderBySortOrderAscNameAsc(): List<DepartmentEntity>
+
+    fun findAllByParentId(parentId: UUID?): List<DepartmentEntity>
+
+    fun existsByParentId(parentId: UUID): Boolean
+
+    fun existsByNameAndParentId(name: String, parentId: UUID?): Boolean
+
 }

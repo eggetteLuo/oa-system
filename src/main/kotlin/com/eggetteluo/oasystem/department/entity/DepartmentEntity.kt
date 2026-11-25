@@ -7,6 +7,7 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import java.util.UUID
 
 @Entity
 @Table(name = "sys_department")
@@ -21,9 +22,13 @@ class DepartmentEntity(
     @Column(nullable = false)
     var sortOrder: Int = 0, // 用于排序
 
-    // 自关联：多对一
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    var parent: DepartmentEntity? = null
+    @Column
+    var leaderId: UUID? = null, // 部门负责人ID
+
+    @Column(nullable = false)
+    var enabled: Boolean = true, // 是否启用
+
+    @Column
+    var parentId: UUID? = null // 父级部门ID
 
 ) : BaseEntity()
