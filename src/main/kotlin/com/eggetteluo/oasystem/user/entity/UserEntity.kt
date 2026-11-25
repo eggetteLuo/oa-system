@@ -41,7 +41,7 @@ class UserEntity(
     var status: UserStatus = UserStatus.ACTIVE, // 用户状态
 
     @Column(name = "role_id")
-    var roleId: UUID? = null, // 角色Id
+    var roleId: UUID, // 角色Id
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)

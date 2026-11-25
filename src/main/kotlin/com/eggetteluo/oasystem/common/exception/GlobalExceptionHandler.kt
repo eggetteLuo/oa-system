@@ -2,9 +2,13 @@ package com.eggetteluo.oasystem.common.exception
 
 import com.eggetteluo.oasystem.common.response.ApiResponse
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.authorization.AuthorizationDeniedException
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import tools.jackson.databind.DatabindException
 
@@ -51,10 +55,42 @@ class GlobalExceptionHandler {
         return ApiResponse.error(400, errorMessage)
     }
 
-    // 兜底异常：处理所有其他未捕获的异常（比如空指针、代码Bug）
+    /**
+     * 处理请求方法不支持异常
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    fun handleMethodNotSupportedException(
+        e: HttpRequestMethodNotSupportedException
+    ): ApiResponse<Unit> {
+        return ApiResponse.error(405, "当前接口不支持 ${e.method} 请求，请检查请求方式")
+    }
+
+    /**
+     * 处理 Spring Security 方法级权限校验失败
+     */
+    @ExceptionHandler(AuthorizationDeniedException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun handleAuthorizationDeniedException(
+        e: AuthorizationDeniedException
+    ): ApiResponse<Unit> {
+        return ApiResponse.error(403, "权限不足，无权访问该资源")
+    }
+
+    /**
+     * 处理其他 Spring Security 权限不足异常
+     */
+    @ExceptionHandler(AccessDeniedException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun handleAccessDeniedException(
+        e: AccessDeniedException
+    ): ApiResponse<Unit> {
+        return ApiResponse.error(403, "权限不足，无权访问该资源")
+    }
+
     @ExceptionHandler(Exception::class)
     fun handleException(e: Exception): ApiResponse<Unit> {
-        e.printStackTrace() // 在控制台打印完整报错，方便排查
+        e.printStackTrace()
         return ApiResponse.error(500, "系统内部错误，请联系管理员")
     }
 

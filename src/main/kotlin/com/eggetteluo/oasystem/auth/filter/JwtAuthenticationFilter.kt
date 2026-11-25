@@ -1,12 +1,14 @@
 package com.eggetteluo.oasystem.auth.filter
 
 import com.eggetteluo.oasystem.auth.service.TokenService
+import com.eggetteluo.oasystem.role.repository.RoleRepository
 import com.eggetteluo.oasystem.user.repository.UserRepository
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
@@ -16,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Component
 class JwtAuthenticationFilter(
     private val userRepository: UserRepository,
+    private val roleRepository: RoleRepository,
     private val tokenService: TokenService
 ) : OncePerRequestFilter() {
 
@@ -51,25 +54,35 @@ class JwtAuthenticationFilter(
             // 查询用户信息
             val userEntity = userRepository.findByIdOrNull(userId)
             if (userEntity != null) {
-                val userDetails = User.withUsername(userEntity.username)
-                    .password("")
-                    .authorities("ROLE_USER")
-                    .build()
+                // 查询用户对应角色
+                val roleEntity = roleRepository.findByIdOrNull(userEntity.roleId)
+                if (roleEntity != null && roleEntity.enabled) {
+                    // 将角色编码转换为 Spring Security 权限
+                    val authorities = listOf(
+                        SimpleGrantedAuthority("ROLE_${roleEntity.code}")
+                    )
 
-                // 创建认证对象
-                val authentication = UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.authorities
-                )
+                    // 创建 UserDetails
+                    val userDetails = User.withUsername(userEntity.username)
+                        .password("")
+                        .authorities(authorities)
+                        .build()
 
-                authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
+                    // 创建认证对象
+                    val authentication = UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        authorities
+                    )
 
-                // 设置 Spring Security 上下文
-                val context = SecurityContextHolder.createEmptyContext()
-                context.authentication = authentication
+                    authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
 
-                SecurityContextHolder.setContext(context)
+                    // 设置 Spring Security 上下文
+                    val context = SecurityContextHolder.createEmptyContext()
+                    context.authentication = authentication
+
+                    SecurityContextHolder.setContext(context)
+                }
             } else {
                 // 用户已不存在，清除对应登录状态
                 tokenService.deleteToken(token)

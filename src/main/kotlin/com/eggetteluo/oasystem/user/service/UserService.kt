@@ -38,6 +38,16 @@ class UserService(
         val dept = departmentRepository.findById(request.departmentId)
             .orElseThrow { BusinessException(404, "部门不存在") }
 
+        // 查询默认角色：普通员工
+        val defaultRole = roleRepository.findByCode("EMPLOYEE")
+            ?.takeIf { it.enabled }
+            ?: throw BusinessException(500, "默认角色 EMPLOYEE 不存在或已禁用")
+
+        // 获取默认角色 ID
+        val roleId = defaultRole.id
+            ?: throw BusinessException(500, "默认角色 ID 不存在")
+
+        // 初始化工号年度
         val year = LocalDateTime.now().year
         employeeNoService.initializeYear(year)
 
@@ -49,7 +59,8 @@ class UserService(
             realName = request.realName,
             email = request.email,
             phone = request.phone,
-            department = dept
+            department = dept,
+            roleId = roleId
         )
 
         val saved = userRepository.save(user)
