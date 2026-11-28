@@ -10,7 +10,7 @@ import jakarta.persistence.Table
 class EmployeeNoSequenceEntity(
 
     @Id
-    @Column
+    @Column(nullable = false)
     var year: Int,
 
     @Column(nullable = false)

@@ -1,4 +1,4 @@
-package com.eggetteluo.oasystem.common
+package com.eggetteluo.oasystem.common.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.EntityListeners

@@ -1,6 +1,6 @@
 package com.eggetteluo.oasystem.user.entity
 
-import com.eggetteluo.oasystem.common.BaseEntity
+import com.eggetteluo.oasystem.common.entity.BaseEntity
 import com.eggetteluo.oasystem.department.entity.DepartmentEntity
 import com.eggetteluo.oasystem.user.enums.UserStatus
 import jakarta.persistence.Column
@@ -40,7 +40,7 @@ class UserEntity(
     @Column(nullable = false, length = 20)
     var status: UserStatus = UserStatus.ACTIVE, // 用户状态
 
-    @Column(name = "role_id")
+    @Column(name = "role_id", nullable = false)
     var roleId: UUID, // 角色Id
 
     @ManyToOne(fetch = FetchType.LAZY)

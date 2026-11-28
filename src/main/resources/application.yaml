@@ -1,18 +1,37 @@
 spring:
   application:
     name: oa-system
+
   datasource:
     url: jdbc:postgresql://localhost:5432/oa_dev
     username: oa
     password: oa_pass
+
   jpa:
     hibernate:
       ddl-auto: update
+
+    # 让 SQL 初始化发生在 Hibernate 建表之后
+    defer-datasource-initialization: true
+
     show-sql: true
     open-in-view: false
+
+  # SQL 数据初始化
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/init-data.sql
+      continue-on-error: false
+
   data:
     redis:
       host: localhost
       port: 6379
-      # password: 如果有密码填这里
       database: 0
+
+app:
+  initial-admin:
+    enabled: true
+    password: "admin123"
+    department-id: "00000000-0000-0000-0000-000000000001"
