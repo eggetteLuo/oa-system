@@ -98,8 +98,8 @@ class RoleService(
             throw BusinessException(400, "内置角色不允许删除")
         }
 
-        // 检查是否有用户绑定该角色
-        val userCount = userRepository.countByRoleId(id)
+        // 检查是否有用户绑定该角色（已软删除的用户不计入）
+        val userCount = userRepository.countByRoleIdAndDeletedAtIsNull(id)
         if (userCount > 0) {
             throw BusinessException(400, "该角色下还有 $userCount 个用户，无法删除")
         }
@@ -135,7 +135,7 @@ class RoleService(
             description = role.description,
             enabled = role.enabled,
             builtIn = role.builtIn,
-            userCount = userRepository.countByRoleId(roleId),
+            userCount = userRepository.countByRoleIdAndDeletedAtIsNull(roleId),
             createdAt = role.createdAt
         )
     }

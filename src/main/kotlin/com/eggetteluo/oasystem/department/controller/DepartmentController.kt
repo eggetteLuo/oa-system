@@ -6,6 +6,7 @@ import com.eggetteluo.oasystem.department.dto.DepartmentTreeResponse
 import com.eggetteluo.oasystem.department.dto.DeptResponse
 import com.eggetteluo.oasystem.department.service.DepartmentService
 import jakarta.validation.Valid
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -21,11 +22,13 @@ class DepartmentController(
 ) {
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('department:create')")
     fun create(@Valid @RequestBody request: CreateDeptRequest): ApiResponse<DeptResponse> {
         return ApiResponse.success(departmentService.createDept(request))
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('department:read')")
     fun getAll(): ApiResponse<List<DeptResponse>> {
         return ApiResponse.success(departmentService.getAllDepts())
     }
@@ -34,11 +37,13 @@ class DepartmentController(
      * 部门树形查询
      */
     @GetMapping("/tree")
+    @PreAuthorize("hasAuthority('department:read')")
     fun tree(): ApiResponse<List<DepartmentTreeResponse>> {
         return ApiResponse.success(departmentService.getDepartmentTree())
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('department:read')")
     fun getById(@PathVariable id: UUID): ApiResponse<DeptResponse> {
         return ApiResponse.success(departmentService.getDeptById(id))
     }

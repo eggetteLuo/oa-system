@@ -19,7 +19,6 @@ import java.util.UUID
  */
 @RestController
 @RequestMapping("/api/role/{roleId}/permissions")
-@PreAuthorize("hasRole('ADMIN')")
 class RolePermissionController(
     private val rolePermissionService: RolePermissionService
 ) {
@@ -28,6 +27,7 @@ class RolePermissionController(
      * 查询角色拥有的权限
      */
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('role:permission:read')")
     fun getRolePermissions(
         @PathVariable roleId: UUID
     ): ApiResponse<List<PermissionResponse>> {
@@ -40,6 +40,7 @@ class RolePermissionController(
      * 整体替换角色权限
      */
     @PutMapping("/update")
+    @PreAuthorize("hasAuthority('role:permission:assign')")
     fun replaceRolePermissions(
         @PathVariable roleId: UUID,
         @Valid @RequestBody request: UpdateRolePermissionsRequest

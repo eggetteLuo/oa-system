@@ -15,7 +15,6 @@ import java.util.UUID
  */
 @RestController
 @RequestMapping("/api/permission")
-@PreAuthorize("hasRole('ADMIN')")
 class PermissionController(
     private val permissionService: PermissionService
 ) {
@@ -24,6 +23,7 @@ class PermissionController(
      * 查询权限列表
      */
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('permission:read')")
     fun getPermissionList(): ApiResponse<List<PermissionResponse>> {
         return ApiResponse.success(permissionService.list())
     }
@@ -32,6 +32,7 @@ class PermissionController(
      * 查询权限详情
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('permission:read')")
     fun getPermission(
         @PathVariable id: UUID
     ): ApiResponse<PermissionResponse> {

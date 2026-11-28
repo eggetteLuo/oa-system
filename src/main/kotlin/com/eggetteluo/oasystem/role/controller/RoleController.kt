@@ -19,7 +19,6 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/role")
-@PreAuthorize("hasRole('ADMIN')")
 class RoleController(
     private val roleService: RoleService
 ) {
@@ -28,7 +27,10 @@ class RoleController(
      * 创建角色
      */
     @PostMapping("/create")
-    fun createRole(@Valid @RequestBody request: CreateRoleRequest): ApiResponse<RoleResponse> {
+    @PreAuthorize("hasAuthority('role:create')")
+    fun createRole(
+        @Valid @RequestBody request: CreateRoleRequest
+    ): ApiResponse<RoleResponse> {
         return ApiResponse.success(roleService.create(request))
     }
 
@@ -36,6 +38,7 @@ class RoleController(
      * 查询角色列表
      */
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('role:read')")
     fun getRoleList(): ApiResponse<List<RoleResponse>> {
         return ApiResponse.success(roleService.list())
     }
@@ -44,7 +47,10 @@ class RoleController(
      * 查询角色详情
      */
     @GetMapping("/{id}")
-    fun getRole(@PathVariable id: UUID): ApiResponse<RoleResponse> {
+    @PreAuthorize("hasAuthority('role:read')")
+    fun getRole(
+        @PathVariable id: UUID
+    ): ApiResponse<RoleResponse> {
         return ApiResponse.success(roleService.getById(id))
     }
 
@@ -52,6 +58,7 @@ class RoleController(
      * 更新角色
      */
     @PutMapping("/update/{id}")
+    @PreAuthorize("hasAuthority('role:update')")
     fun updateRole(
         @PathVariable id: UUID,
         @Valid @RequestBody request: UpdateRoleRequest
@@ -63,7 +70,10 @@ class RoleController(
      * 删除角色
      */
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: UUID): ApiResponse<Unit> {
+    @PreAuthorize("hasAuthority('role:delete')")
+    fun delete(
+        @PathVariable id: UUID
+    ): ApiResponse<Unit> {
         roleService.delete(id)
         return ApiResponse.success(Unit)
     }

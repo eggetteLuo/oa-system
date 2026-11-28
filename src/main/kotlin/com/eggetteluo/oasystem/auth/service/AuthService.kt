@@ -17,8 +17,10 @@ class AuthService(
 ) {
 
     fun login(request: LoginRequest): LoginResponse {
-        // 查用户是否存在
-        val user = userRepository.findByUsername(request.username) ?: throw BusinessException(400, "账号或密码错误")
+        // 查用户是否存在（已软删除的用户等同不存在）
+        val user = userRepository.findByUsername(request.username)
+            ?.takeIf { it.deletedAt == null }
+            ?: throw BusinessException(400, "账号或密码错误")
 
         // 校验密码是否正确
         if (!passwordEncoder.matches(request.password, user.password)) {
