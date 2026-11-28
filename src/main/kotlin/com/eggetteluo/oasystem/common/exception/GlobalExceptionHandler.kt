@@ -10,6 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.servlet.NoHandlerFoundException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 import tools.jackson.databind.DatabindException
 
 /**
@@ -74,6 +76,7 @@ class GlobalExceptionHandler {
     fun handleAuthorizationDeniedException(
         e: AuthorizationDeniedException
     ): ApiResponse<Unit> {
+        e.printStackTrace()
         return ApiResponse.error(403, "权限不足，无权访问该资源")
     }
 
@@ -85,9 +88,37 @@ class GlobalExceptionHandler {
     fun handleAccessDeniedException(
         e: AccessDeniedException
     ): ApiResponse<Unit> {
+        e.printStackTrace()
         return ApiResponse.error(403, "权限不足，无权访问该资源")
     }
 
+    /**
+     * 处理接口不存在异常
+     */
+    @ExceptionHandler(NoHandlerFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleNoHandlerFoundException(
+        e: NoHandlerFoundException
+    ): ApiResponse<Unit> {
+        e.printStackTrace()
+        return ApiResponse.error(404, "请求的接口不存在")
+    }
+
+    /**
+     * 处理静态资源不存在异常
+     */
+    @ExceptionHandler(NoResourceFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleNoResourceFoundException(
+        e: NoResourceFoundException
+    ): ApiResponse<Unit> {
+        e.printStackTrace()
+        return ApiResponse.error(404, "请求的接口或资源不存在")
+    }
+
+    /**
+     * 兜底异常处理
+     */
     @ExceptionHandler(Exception::class)
     fun handleException(e: Exception): ApiResponse<Unit> {
         e.printStackTrace()
