@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 class UserController(
     private val userService: UserService
 ) {
     /**
      * 创建用户
      */
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasAuthority('user:create')")
     fun createUser(@Valid @RequestBody request: CreateUserRequest): ApiResponse<UserResponse> {
         return ApiResponse.success(userService.createUser(request))
@@ -28,7 +28,7 @@ class UserController(
     /**
      * 查询用户列表
      */
-    @GetMapping
+    @GetMapping("/list")
     @PreAuthorize("hasAuthority('user:read')")
     fun getAllUsers(): ApiResponse<List<UserResponse>> {
         return ApiResponse.success(userService.getAllUsers())
